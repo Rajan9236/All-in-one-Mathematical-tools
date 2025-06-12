@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R.J Hyper Mathematical Toolkit</title>
+    <style>
+        /* Root Variables for Theming */
+        :root {
+            --primary: #1e40af; /* Main color */
+            --secondary: #3b82f6; /* Accent */
+            --accent: #f59e0b; /* Highlight */
+            --bg-light: #f3f4f6; /* Light background */
+            --bg-dark: #1f2937; /* Dark background */
+            --text-light: #111827; /* Light text */
+            --text-dark: #f9fafb; /* Dark text */
+            --neon-glow: #00ff88; /* Neon theme */
+        }
+
+        /* Base Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-light);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* Neon Mode */
+        body.neon-mode {
+            --primary: var(--neon-glow);
+            --secondary: #00cc66;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--primary);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .navbar select, .navbar button {
+            padding: 0.5rem;
+            margin-left: 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            background: var(--secondary);
+            color: white;
+            border: none;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 1rem auto;
+            padding: 1rem;
+        }
+
+        /* Tool Section */
+        .tool-section {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--accent);
+        }
+
+        .tool-section.hidden {
+            display: none;
+        }
+
+        .tool-section h2 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .tool-section input, .tool-section select {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            width: calc(100% - 1rem);
+        }
+
+        .tool-section button {
+            padding: 0.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .tool-section button:hover {
+            transform: scale(1.05);
+        }
+
+        /* History Panel */
+        .history-panel {
+            position: fixed;
+            right: 0;
+            top: 60px;
+            width: 300px;
+            height: calc(100vh - 60px);
+            background: white;
+            padding: 1rem;
+            box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .history-panel.open {
+            transform: translateX(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .tool-section input, .tool-section select {
+                width: 100%;
+            }
+
+            .history-panel {
+                width: 100%;
+                top: 50px;
+                height: calc(100vh - 50px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1 id="appTitle">R.J Hyper Mathematical Toolkit</h1>
+        <div>
+            <select id="toolSelector" onchange="switchTool()">
+                <option value="equation">Equation Solver</option>
+                <option value="matrix">Matrix Operations</option>
+                <option value="stats">Statistics</option>
+                <option value="unit">Unit Converter</option>
+                <option value="graph">Graph Plotter</option>
+                <option value="prime">Prime Factorization</option>
+                <option value="trig">Trigonometric Solver</option>
+                <option value="finance">Financial Tools</option>
+                <option value="geometry">Geometry Tools</option>
+                <option value="base">Base Converter</option>
+            </select>
+            <select id="languageSelector" onchange="switchLanguage()">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+            </select>
+            <select id="themeSelector" onchange="switchTheme()">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="neon">Neon</option>
+            </select>
+            <button onclick="toggleHistory()">History</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Equation Solver -->
+        <div class="tool-section" id="equationTool">
+            <h2>Equation Solver</h2>
+            <select id="equationType">
+                <option value="linear">Linear (ax + b = 0)</option>
+                <option value="quadratic">Quadratic (ax² + bx + c = 0)</option>
+                <option value="cubic">Cubic (ax³ + bx² + cx + d = 0)</option>
+            </select>
+            <input type="number" id="eqA" placeholder="Coefficient a">
+            <input type="number" id="eqB" placeholder="Coefficient b">
+            <input type="number" id="eqC" placeholder="Coefficient c (if applicable)">
+            <input type="number" id="eqD" placeholder="Coefficient d (if applicable)">
+            <button onclick="solveEquation()">Solve</button>
+            <p id="eqResult"></p>
+        </div>
+
+        <!-- Matrix Operations -->
+        <div class="tool-section hidden" id="matrixTool">
+            <h2>Matrix Operations</h2>
+            <select id="matrixOp">
+                <option value="add">Add</option>
+                <option value="subtract">Subtract</option>
+                <option value="multiply">Multiply</option>
+                <option value="determinant">Determinant</option>
+                <option value="inverse">Inverse</option>
+            </select>
+            <input type="text" id="matrixA" placeholder="Matrix A (e.g., 1,2,3,4 for 2x2)">
+            <input type="text" id="matrixB" placeholder="Matrix B (e.g., 5,6,7,8 for 2x2)">
+            <button onclick="matrixOperation()">Calculate</button>
+            <p id="matrixResult"></p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="tool-section hidden" id="statsTool">
+            <h2>Statistics</h2>
+            <input type="text" id="statsData" placeholder="Enter numbers (e.g., 1,2,3,4)">
+            <button onclick="calculateStats()">Calculate</button>
+            <p id="statsResult"></p>
+        </div>
+
+        <!-- Unit Converter -->
+        <div class="tool-section hidden" id="unitTool">
+            <h2>Unit Converter</h2>
+            <select id="unitType" onchange="updateUnitOptions()">
+                <option value="length">Length</option>
+                <option value="weight">Weight</option>
+                <option value="temperature">Temperature</option>
+                <option value="currency">Currency</option>
+            </select>
+            <input type="number" id="unitInput" placeholder="Value">
+            <select id="fromUnit"></select>
+            <select id="toUnit"></select>
+            <button onclick="convertUnit()">Convert</button>
+            <p id="unitResult"></p>
+        </div>
+
+        <!-- Graph Plotter -->
+        <div class="tool-section hidden" id="graphTool">
+            <h2>Graph Plotter</h2>
+            <select id="graphType">
+                <option value="linear">Linear (y = mx + c)</option>
+                <option value="quadratic">Quadratic (y = ax² + bx + c)</option>
+            </select>
+            <input type="number" id="graphA" placeholder="a or m">
+            <input type="number" id="graphB" placeholder="b">
+            <input type="number" id="graphC" placeholder="c">
+            <button onclick="plotGraph()">Plot</button>
+            <canvas id="graphCanvas" width="300" height="200"></canvas>
+        </div>
+
+        <!-- Prime Factorization -->
+        <div class="tool-section hidden" id="primeTool">
+            <h2>Prime Factorization</h2>
+            <input type="number" id="primeInput" placeholder="Enter a number">
+            <button onclick="primeFactorize()">Factorize</button>
+            <p id="primeResult"></p>
+        </div>
+
+        <!-- Trigonometric Solver -->
+        <div class="tool-section hidden" id="trigTool">
+            <h2>Trigonometric Solver</h2>
+            <select id="trigFunc">
+                <option value="sin">sin</option>
+                <option value="cos">cos</option>
+                <option value="tan">tan</option>
+                <option value="asin">arcsin</option>
+                <option value="acos">arccos</option>
+                <option value="atan">arctan</option>
+            </select>
+            <input type="number" id="trigInput" placeholder="Value (degrees for sin/cos/tan)">
+            <button onclick="solveTrig()">Calculate</button>
+            <p id="trigResult"></p>
+        </div>
+
+        <!-- Financial Tools -->
+        <div class="tool-section hidden" id="financeTool">
+            <h2>Financial Tools</h2>
+            <select id="financeType">
+                <option value="ci">Compound Interest</option>
+                <option value="emi">EMI Calculator</option>
+            </select>
+            <input type="number" id="financeP" placeholder="Principal/Loan Amount">
+            <input type="number" id="financeR" placeholder="Rate (%)">
+            <input type="number" id="financeT" placeholder="Time (Years)">
+            <input type="number" id="financeN" placeholder="Compounds per Year (for CI)">
+            <button onclick="calculateFinance()">Calculate</button>
+            <p id="financeResult"></p>
+        </div>
+
+        <!-- Geometry Tools -->
+        <div class="tool-section hidden" id="geometryTool">
+            <h2>Geometry Tools</h2>
+            <select id="geometryShape">
+                <option value="circle">Circle</option>
+                <option value="rectangle">Rectangle</option>
+                <option value="triangle">Triangle</option>
+                <option value="cube">Cube</option>
+            </select>
+            <input type="number" id="geoA" placeholder="Radius/Length/Base/Side">
+            <input type="number" id="geoB" placeholder="Width/Height (if applicable)">
+            <button onclick="calculateGeometry()">Calculate</button>
+            <p id="geoResult"></p>
+        </div>
+
+        <!-- Base Converter -->
+        <div class="tool-section hidden" id="baseTool">
+            <h2>Base Converter</h2>
+            <select id="baseFrom">
+                <option value="dec">Decimal</option>
+                <option value="bin">Binary</option>
+                <option value="hex">Hexadecimal</option>
+                <option value="oct">Octal</option>
+            </select>
+            <select id="baseTo">
+                <option value="dec">Decimal</option>
+                <option value="bin">Binary</option>
+                <option value="hex">Hexadecimal</option>
+                <option value="oct">Octal</option>
+            </select>
+            <input type="text" id="baseInput" placeholder="Enter number">
+            <button onclick="convertBase()">Convert</button>
+            <p id="baseResult"></p>
+        </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="history-panel" id="historyPanel">
+        <h2>History</h2>
+        <ul id="historyList"></ul>
+        <button onclick="exportHistory()">Export</button>
+        <button onclick="clearHistory()">Clear</button>
+    </div>
+
+    <script>
+        // Global State
+        let history = [];
+        let currentTool = 'equation';
+        let currentLanguage = 'en';
+
+        // Tool Switching
+        function switchTool() {
+            currentTool = document.getElementById('toolSelector').value;
+            const tools = ['equationTool', 'matrixTool', 'statsTool', 'unitTool', 'graphTool', 'primeTool', 'trigTool', 'financeTool', 'geometryTool', 'baseTool'];
+            tools.forEach(tool => document.getElementById(tool).classList.toggle('hidden', tool !== `${currentTool}Tool`));
+        }
+
+        // Language Switching
+        function switchLanguage() {
+            currentLanguage = document.getElementById('languageSelector').value;
+            const translations = {
+                en: { appTitle: 'R.J Hyper Mathematical Toolkit' },
+                hi: { appTitle: 'आर.जे. हाइपर मैथमेटिकल टूलकिट' }
+            };
+            document.getElementById('appTitle').textContent = translations[currentLanguage].appTitle;
+        }
+
+        // Theme Switching
+        function switchTheme() {
+            const theme = document.getElementById('themeSelector').value;
+            document.body.className = theme === 'light' ? '' : `${theme}-mode`;
+        }
+
+        // History Management
+        function updateHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = history.map(h => `<li>${h.tool}: ${h.result}</li>`).join('');
+            localStorage.setItem('history', JSON.stringify(history));
+        }
+
+        function exportHistory() {
+            const csv = history.map(h => `${h.tool},${h.result}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'history.csv';
+            a.click();
+        }
+
+        function clearHistory() {
+            history = [];
+            updateHistory();
+        }
+
+        function toggleHistory() {
+            document.getElementById('historyPanel').classList.toggle('open');
+        }
+
+        // Equation Solver
+        function solveEquation() {
+            const type = document.getElementById('equationType').value;
+            const a = parseFloat(document.getElementById('eqA').value);
+            const b = parseFloat(document.getElementById('eqB').value);
+            const c = parseFloat(document.getElementById('eqC').value) || 0;
+            const d = parseFloat(document.getElementById('eqD').value) || 0;
+            let result = '';
+
+            if (isNaN(a) || a === 0) return alert('Invalid coefficient a');
+            if (isNaN(b)) return alert('Invalid coefficient b');
+
+            if (type === 'linear') {
+                const x = -b / a;
+                result = `x = ${x.toFixed(2)}`;
+            } else if (type === 'quadratic') {
+                const disc = b * b - 4 * a * c;
+                if (disc < 0) result = 'No real roots';
+                else {
+                    const x1 = (-b + Math.sqrt(disc)) / (2 * a);
+                    const x2 = (-b - Math.sqrt(disc)) / (2 * a);
+                    result = `x = ${x1.toFixed(2)}, ${x2.toFixed(2)}`;
+                }
+            } else if (type === 'cubic') {
+                // Simplified cubic solver (approximation)
+                let x = -b / (3 * a); // Basic approximation
+                result = `Approximate x ≈ ${x.toFixed(2)}`;
+            }
+
+            document.getElementById('eqResult').textContent = result;
+            history.push({ tool: 'Equation Solver', result });
+            updateHistory();
+        }
+
+        // Matrix Operations
+        function matrixOperation() {
+            const op = document.getElementById('matrixOp').value;
+            const a = document.getElementById('matrixA').value.split(',').map(Number);
+            const b = document.getElementById('matrixB').value.split(',').map(Number);
+            let result = '';
+
+            if (a.length !== 4 || (op !== 'determinant' && op !== 'inverse' && b.length !== 4)) {
+                return alert('Enter 2x2 matrices (4 numbers each)');
+            }
+
+            const A = [[a[0], a[1]], [a[2], a[3]]];
+            const B = [[b[0], b[1]], [b[2], b[3]]];
+
+            if (op === 'add') {
+                const C = [[A[0][0] + B[0][0], A[0][1] + B[0][1]], [A[1][0] + B[1][0], A[1][1] + B[1][1]]];
+                result = `Result: ${C[0]}, ${C[1]}`;
+            } else if (op === 'subtract') {
+                const C = [[A[0][0] - B[0][0], A[0][1] - B[0][1]], [A[1][0] - B[1][0], A[1][1] - B[1][1]]];
+                result = `Result: ${C[0]}, ${C[1]}`;
+            } else if (op === 'multiply') {
+                const C = [[A[0][0] * B[0][0] + A[0][1] * B[1][0], A[0][0] * B[0][1] + A[0][1] * B[1][1]],
+                           [A[1][0] * B[0][0] + A[1][1] * B[1][0], A[1][0] * B[0][1] + A[1][1] * B[1][1]]];
+                result = `Result: ${C[0]}, ${C[1]}`;
+            } else if (op === 'determinant') {
+                const det = A[0][0] * A[1][1] - A[0][1] * A[1][0];
+                result = `Determinant: ${det}`;
+            } else if (op === 'inverse') {
+                const det = A[0][0] * A[1][1] - A[0][1] * A[1][0];
+                if (det === 0) result = 'Matrix not invertible';
+                else {
+                    const inv = [[A[1][1] / det, -A[0][1] / det], [-A[1][0] / det, A[0][0] / det]];
+                    result = `Inverse: ${inv[0]}, ${inv[1]}`;
+                }
+            }
+
+            document.getElementById('matrixResult').textContent = result;
+            history.push({ tool: 'Matrix Operations', result });
+            updateHistory();
+        }
+
+        // Statistics
+        function calculateStats() {
+            const data = document.getElementById('statsData').value.split(',').map(Number).filter(x => !isNaN(x));
+            if (!data.length) return alert('Invalid data');
+
+            const mean = data.reduce((a, b) => a + b, 0) / data.length;
+            const sorted = [...data].sort((a, b) => a - b);
+            const median = sorted.length % 2 ? sorted[Math.floor(sorted.length / 2)] : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+            const mode = data.reduce((a, b, i, arr) => (arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b), data[0]);
+            const variance = data.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / data.length;
+            const stdDev = Math.sqrt(variance);
+
+            const result = `Mean: ${mean.toFixed(2)}, Median: ${median.toFixed(2)}, Mode: ${mode}, Std Dev: ${stdDev.toFixed(2)}`;
+            document.getElementById('statsResult').textContent = result;
+            history.push({ tool: 'Statistics', result });
+            updateHistory();
+        }
+
+        // Unit Converter
+        function updateUnitOptions() {
+            const type = document.getElementById('unitType').value;
+            const units = {
+                length: ['m', 'cm', 'km', 'ft'],
+                weight: ['kg', 'g', 'lb'],
+                temperature: ['°C', '°F', 'K'],
+                currency: ['INR', 'USD', 'EUR']
+            };
+            const from = document.getElementById('fromUnit');
+            const to = document.getElementById('toUnit');
+            from.innerHTML = to.innerHTML = units[type].map(u => `<option value="${u}">${u}</option>`).join('');
+        }
+
+        function convertUnit() {
+            const value = parseFloat(document.getElementById('unitInput').value);
+            const from = document.getElementById('fromUnit').value;
+            const to = document.getElementById('toUnit').value;
+            const type = document.getElementById('unitType').value;
+            if (isNaN(value)) return alert('Enter a valid value');
+
+            let result;
+            if (type === 'length') {
+                const conv = { m: 1, cm: 0.01, km: 1000, ft: 0.3048 };
+                result = value * conv[from] / conv[to];
+            } else if (type === 'weight') {
+                const conv = { kg: 1, g: 0.001, lb: 0.453592 };
+                result = value * conv[from] / conv[to];
+            } else if (type === 'temperature') {
+                let celsius;
+                if (from === '°C') celsius = value;
+                else if (from === '°F') celsius = (value - 32) * 5 / 9;
+                else celsius = value - 273.15;
+                if (to === '°C') result = celsius;
+                else if (to === '°F') result = celsius * 9 / 5 + 32;
+                else result = celsius + 273.15;
+            } else if (type === 'currency') {
+                const rates = { INR: 1, USD: 0.012, EUR: 0.011 };
+                result = value * rates[from] / rates[to];
+            }
+
+            const finalResult = `${value} ${from} = ${result.toFixed(2)} ${to}`;
+            document.getElementById('unitResult').textContent = finalResult;
+            history.push({ tool: 'Unit Converter', result: finalResult });
+            updateHistory();
+        }
+
+        // Graph Plotter
+        function plotGraph() {
+            const type = document.getElementById('graphType').value;
+            const a = parseFloat(document.getElementById('graphA').value);
+            const b = parseFloat(document.getElementById('graphB').value);
+            const c = parseFloat(document.getElementById('graphC').value) || 0;
+            if (isNaN(a) || isNaN(b)) return alert('Invalid coefficients');
+
+            const canvas = document.getElementById('graphCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+
+            const w = canvas.width, h = canvas.height;
+            const scale = 20;
+            ctx.moveTo(0, h / 2);
+            ctx.lineTo(w, h / 2);
+            ctx.moveTo(w / 2, 0);
+            ctx.lineTo(w / 2, h);
+            ctx.strokeStyle = 'gray';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.strokeStyle = 'blue';
+            for (let px = 0; px < w; px++) {
+                const x = (px - w / 2) / scale;
+                let y;
+                if (type === 'linear') y = a * x + b;
+                else y = a * x * x + b * x + c;
+                const py = h / 2 - y * scale;
+                if (px === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            history.push({ tool: 'Graph Plotter', result: `Plotted ${type} function` });
+            updateHistory();
+        }
+
+        // Prime Factorization
+        function primeFactorize() {
+            let n = parseInt(document.getElementById('primeInput').value);
+            if (isNaN(n) || n < 2) return alert('Enter a number >= 2');
+
+            const factors = [];
+            for (let i = 2; i <= n; i++) {
+                while (n % i === 0) {
+                    factors.push(i);
+                    n /= i;
+                }
+            }
+            const result = `Factors: ${factors.join(' × ')}`;
+            document.getElementById('primeResult').textContent = result;
+            history.push({ tool: 'Prime Factorization', result });
+            updateHistory();
+        }
+
+        // Trigonometric Solver
+        function solveTrig() {
+            const func = document.getElementById('trigFunc').value;
+            let value = parseFloat(document.getElementById('trigInput').value);
+            if (isNaN(value)) return alert('Enter a valid value');
+
+            const toRad = x => x * Math.PI / 180;
+            const toDeg = x => x * 180 / Math.PI;
+            let result;
+
+            if (func === 'sin') result = Math.sin(toRad(value));
+            else if (func === 'cos') result = Math.cos(toRad(value));
+            else if (func === 'tan') result = Math.tan(toRad(value));
+            else if (func === 'asin') result = toDeg(Math.asin(value));
+            else if (func === 'acos') result = toDeg(Math.acos(value));
+            else if (func === 'atan') result = toDeg(Math.atan(value));
+
+            const finalResult = `${func}(${value}) = ${result.toFixed(4)}`;
+            document.getElementById('trigResult').textContent = finalResult;
+            history.push({ tool: 'Trigonometric Solver', result: finalResult });
+            updateHistory();
+        }
+
+        // Financial Tools
+        function calculateFinance() {
+            const type = document.getElementById('financeType').value;
+            const P = parseFloat(document.getElementById('financeP').value);
+            const R = parseFloat(document.getElementById('financeR').value) / 100;
+            const T = parseFloat(document.getElementById('financeT').value);
+            const N = parseFloat(document.getElementById('financeN').value) || 1;
+            if (isNaN(P) || isNaN(R) || isNaN(T)) return alert('Fill all fields');
+
+            let result;
+            if (type === 'ci') {
+                const amount = P * Math.pow(1 + R / N, N * T);
+                result = `Amount: ₹${amount.toFixed(2)}`;
+            } else if (type === 'emi') {
+                const r = R / 12;
+                const n = T * 12;
+                const emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                result = `EMI: ₹${emi.toFixed(2)}`;
+            }
+
+            document.getElementById('financeResult').textContent = result;
+            history.push({ tool: 'Financial Tools', result });
+            updateHistory();
+        }
+
+        // Geometry Tools
+        function calculateGeometry() {
+            const shape = document.getElementById('geometryShape').value;
+            const a = parseFloat(document.getElementById('geoA').value);
+            const b = parseFloat(document.getElementById('geoB').value) || 0;
+            if (isNaN(a)) return alert('Enter valid dimensions');
+
+            let result;
+            if (shape === 'circle') {
+                const area = Math.PI * a * a;
+                const perimeter = 2 * Math.PI * a;
+                result = `Area: ${area.toFixed(2)}, Perimeter: ${perimeter.toFixed(2)}`;
+            } else if (shape === 'rectangle') {
+                const area = a * b;
+                const perimeter = 2 * (a + b);
+                result = `Area: ${area.toFixed(2)}, Perimeter: ${perimeter.toFixed(2)}`;
+            } else if (shape === 'triangle') {
+                const area = (a * b) / 2;
+                result = `Area: ${area.toFixed(2)}`;
+            } else if (shape === 'cube') {
+                const volume = a * a * a;
+                const surface = 6 * a * a;
+                result = `Volume: ${volume.toFixed(2)}, Surface Area: ${surface.toFixed(2)}`;
+            }
+
+            document.getElementById('geoResult').textContent = result;
+            history.push({ tool: 'Geometry Tools', result });
+            updateHistory();
+        }
+
+        // Base Converter
+        function convertBase() {
+            const from = document.getElementById('baseFrom').value;
+            const to = document.getElementById('baseTo').value;
+            const input = document.getElementById('baseInput').value.trim();
+            let num;
+
+            try {
+                if (from === 'dec') num = parseInt(input, 10);
+                else if (from === 'bin') num = parseInt(input, 2);
+                else if (from === 'hex') num = parseInt(input, 16);
+                else if (from === 'oct') num = parseInt(input, 8);
+
+                if (isNaN(num)) throw new Error('Invalid number');
+
+                let result;
+                if (to === 'dec') result = num.toString(10);
+                else if (to === 'bin') result = num.toString(2);
+                else if (to === 'hex') result = num.toString(16).toUpperCase();
+                else if (to === 'oct') result = num.toString(8);
+
+                const finalResult = `${input} (${from}) = ${result} (${to})`;
+                document.getElementById('baseResult').textContent = finalResult;
+                history.push({ tool: 'Base Converter', result: finalResult });
+                updateHistory();
+            } catch (e) {
+                alert('Invalid input');
+            }
+        }
+
+        // Keyboard Support
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                if (currentTool === 'equation') solveEquation();
+                else if (currentTool === 'matrix') matrixOperation();
+                else if (currentTool === 'stats') calculateStats();
+                else if (currentTool === 'unit') convertUnit();
+                else if (currentTool === 'graph') plotGraph();
+                else if (currentTool === 'prime') primeFactorize();
+                else if (currentTool === 'trig') solveTrig();
+                else if (currentTool === 'finance') calculateFinance();
+                else if (currentTool === 'geometry') calculateGeometry();
+                else if (currentTool === 'base') convertBase();
+            }
+        });
+
+        // Initialize
+        updateUnitOptions();
+        switchLanguage();
+        if (localStorage.getItem('history')) history = JSON.parse(localStorage.getItem('history'));
+        updateHistory();
+    </script>
+</body>
+          </html>
